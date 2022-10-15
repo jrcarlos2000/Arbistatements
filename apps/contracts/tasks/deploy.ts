@@ -29,7 +29,7 @@ task("deploy", "Deploy a Greeter contract")
         const BalanceGiver = await ethers.getContractFactory("BalanceGiver")
 
         const accounts = await ethers.provider.listAccounts();
-        const Arbistatements = await cfArbistatements.deploy(semaphoreAddress,process.env.RELAYER_ADDRESS!, groupId)
+        const Arbistatements : any = await cfArbistatements.deploy(semaphoreAddress,process.env.RELAYER_ADDRESS!, groupId)
         // const Arbistatements : any = await cfArbistatements.deploy(semaphoreAddress,accounts[1], groupId)
         await Arbistatements.deployed()
 
