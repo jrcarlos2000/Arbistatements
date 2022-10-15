@@ -5,7 +5,6 @@ import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 /// @title Arbistatements.
 /// @dev This contract is the main contract of our Arbistatements dApp
-/// @note Please see README.md for more information
 
 contract Arbistatements  is Ownable{
 
@@ -63,7 +62,7 @@ contract Arbistatements  is Ownable{
         uint256 merkleTreeRoot,
         uint256 nullifierHash,
         uint256[8] calldata proof
-    ) public onlyRelayer{
+    ) external {
         // claimWindow[identityCommitment] = block.timestamp + TIME_WINDOW;
         semaphore.verifyProof(groupId, merkleTreeRoot, signal, nullifierHash, groupId, proof);
     }

@@ -4,47 +4,38 @@ import { generateProof, packToSolidityProof } from "@semaphore-protocol/proof"
 import { expect } from "chai"
 import { formatBytes32String,getAddress } from "ethers/lib/utils"
 import { ethers, run } from "hardhat"
-import { Greeter,ChainStatement } from "../build/typechain"
+import { Greeter,Arbistatements } from "../build/typechain"
 import { config } from "../package.json"
 
-describe("Greeter", () => {
-    let chainStatement : ChainStatement
-    // let greeter: Greeter
-    // let signer;
+describe("Arbistatements", () => {
+    let chainStatement : Arbistatements
     const users: any = []
     const groupId = 42;
-    let signer:any;
-    const group = new Group()
-    const group2 = new Group()
-    const myAddress = "0xaE481806AC0aCD80032F7650040744709F19A266"
-    const yourAddress = "0xF3eFACE0E659e9F67978D4c72067E5842Bac492B"
+    let relayer:any;
+    const testAddresses = ["0xaE481806AC0aCD80032F7650040744709F19A266","0xF3eFACE0E659e9F67978D4c72067E5842Bac492B"]
 
     before(async () => {
         chainStatement = await run("deploy", { logs: false, group: groupId })
         const accounts = await ethers.provider.listAccounts();
-        console.log(accounts[0]);
-        signer = ethers.provider.getSigner(accounts[0]);
+        relayer = ethers.provider.getSigner(accounts[1]);
         users.push({
-            identity: new Identity("holaholahola"),
-            // account 19
-            address: [myAddress]
+            identity: new Identity("carloscarloscarlos"),
+            address: testAddresses[0]
         })
 
         users.push({
-            identity: new Identity("dil+2810+password2"),
-            // account 18
-            address: [yourAddress]
+            identity: new Identity("carloscarloscarlos"),
+            address: testAddresses[1]
         })
 
     })
 
     describe("# joinGroup", () => {
         it("Should allow users to join the group", async () => {
-            for (let i = 0; i < 2; i += 1) {
-                // console.log(i)
-                const transaction = await chainStatement.connect(signer).addNewUser(users[i].identity.generateCommitment(), users[i].address[0])
+            for (let i = 0; i < 1; i += 1) {
+                let tmpIdentity = new Identity("carloscarloscarlos");
+                const transaction = await chainStatement.connect(relayer).addNewUser(tmpIdentity.generateCommitment(), users[i].address)
                 await transaction.wait();
-                // await expect(transaction).to.emit(greeter, "NewUser").withArgs(group.members[i], users[i].username)
             }
             // await chainStatement.addNewUser(users[0].identity.generateCommitment(), users[0].address[1])
         })
@@ -57,32 +48,29 @@ describe("Greeter", () => {
 
         it("should manage to get bank statement", async () => {
 
-            group.addMember(users[0].identity.generateCommitment())
-            group.addMember(users[1].identity.generateCommitment())
-
-            const greeting = formatBytes32String("Joined the protocol")
-            const greeting2 = formatBytes32String("Joined theas protocol")
-
-            const fullProof = await generateProof(users[0].identity, group, BigInt(groupId), greeting, {
+            let group2 = new Group();
+            let tmpIdentity : any = new Identity("carloscarloscarlos");
+            group2.addMember(tmpIdentity.generateCommitment());
+            const mess = formatBytes32String("hola")
+            const fullProof = await generateProof(tmpIdentity, group2, BigInt(42), mess, {
                 wasmFilePath,
                 zkeyFilePath
             })
-            const solidityProof = packToSolidityProof(fullProof.proof)
 
+            const solidityProof = packToSolidityProof(fullProof.proof)
+            console.log(tmpIdentity.generateCommitment(),mess);
             const transaction = await chainStatement.claimStatement(
-                users[0].identity.generateCommitment(),
-                greeting,
+                tmpIdentity.generateCommitment(),
+                mess,
                 fullProof.publicSignals.merkleRoot,
                 fullProof.publicSignals.nullifierHash,
                 solidityProof
             )
-            
             await transaction.wait();
-            // console.log("success");
         })
     })
 
-    describe("get address basedd on identity Commitment",()=>{
+    describe("get address based on identity Commitment",()=>{
         it("get address successfull",async()=>{
             for (let i = 0; i<1;i+=1){
                 const addr = await chainStatement.getAddresses(users[i].identity.generateCommitment())

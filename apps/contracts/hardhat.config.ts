@@ -10,32 +10,11 @@ import { resolve } from "path"
 import "solidity-coverage"
 import { config } from "./package.json"
 import "./tasks/deploy"
-import "./tasks/deploy-goerli"
 dotenvConfig({ path: resolve(__dirname, "../../.env") });
 let accounts:any;
 if (process.env.ETHEREUM_PRIVATE_KEY) {
-    accounts = [`0x${process.env.ETHEREUM_PRIVATE_KEY}`]
+    accounts = [`0x${process.env.ETHEREUM_PRIVATE_KEY}`,`0x${process.env.RELAYER_PRIVATE_KEY}`]
 }
-// function getNetworks(): NetworksUserConfig {
-
-
-//         return {
-//             goerli: {
-//                 url: `https://goerli.infura.io/v3/${infuraApiKey}`,
-//                 chainId: 5,
-//                 accounts
-//             },
-//             arbitrum: {
-//                 url: "https://arb1.arbitrum.io/rpc",
-//                 chainId: 42161,
-//                 accounts
-//             },
-            
-//         }
-//     }
-
-//     return {}
-// }
 
 const hardhatConfig: HardhatUserConfig = {
     solidity: config.solidity,

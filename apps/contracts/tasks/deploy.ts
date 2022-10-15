@@ -1,5 +1,6 @@
 import { task, types } from "hardhat/config"
 import {ethers} from "hardhat"
+import { config as dotenvConfig } from "dotenv"
 
 task("deploy", "Deploy a Greeter contract")
     .addOptionalParam("semaphore", "Semaphore contract address", undefined, types.string)
@@ -7,8 +8,6 @@ task("deploy", "Deploy a Greeter contract")
     .addOptionalParam("logs", "Print the logs", true, types.boolean)
     .setAction(async ({ logs, semaphore: semaphoreAddress, group: groupId }, { ethers, run }) => {
 
-        // const accounts = await ethers.provider.listAccounts();
-        // console.log(accounts);
         if (!semaphoreAddress) {
             const { address: verifierAddress } = await run("deploy:verifier", { logs, merkleTreeDepth: 20 })
 
@@ -25,12 +24,27 @@ task("deploy", "Deploy a Greeter contract")
             semaphoreAddress = address
         }
 
-        const Greeter = await ethers.getContractFactory("ChainStatement")
+        const cfArbistatements = await ethers.getContractFactory("Arbistatements")
         const DummyToken = await ethers.getContractFactory("DummyToken")
         const BalanceGiver = await ethers.getContractFactory("BalanceGiver")
 
-        const greeter = await Greeter.deploy(semaphoreAddress,"0xDe3089d40F3491De794fBb1ECA109fAc36F889d0", groupId)
-        await greeter.deployed()
+        const accounts = await ethers.provider.listAccounts();
+        const Arbistatements = await cfArbistatements.deploy(semaphoreAddress,process.env.RELAYER_ADDRESS!, groupId)
+        // const Arbistatements : any = await cfArbistatements.deploy(semaphoreAddress,accounts[1], groupId)
+        await Arbistatements.deployed()
+
+        if(ethers.provider.network.chainId == 1337){
+            console.log("localhost dev")
+            const accounts_to_fund:any = process.env.ACCOUNTS_TO_FUND?.split(",");
+            const signer = await ethers.getSigner(accounts[0]);
+            for(let i = 0; i<accounts_to_fund!.length ; i++){
+                const transactionHash = await signer.sendTransaction({
+                    to: accounts_to_fund[i],
+                    value: ethers.utils.parseEther("1.0"), // Sends exactly 1.0 ether
+                });
+                await transactionHash.wait();
+            }
+        }
         // const cUSDT = await DummyToken.deploy("USDT","USDT");
         // await cUSDT.deployed()
         // const cUSDC = await DummyToken.deploy("USDC","USDC");
@@ -46,7 +60,7 @@ task("deploy", "Deploy a Greeter contract")
 
 
         if (logs) {
-            console.info(`ChainStatment contract has been deployed to: ${greeter.address}`)
+            console.info(`Arbistatements contract has been deployed to: ${Arbistatements.address}`)
         }
 
         // accounts = await ethers.provider.listAccounts();
@@ -57,5 +71,5 @@ task("deploy", "Deploy a Greeter contract")
         //     };
         // const transaction = await signer.sendTransaction(tx);
 
-        return greeter
+        return Arbistatements
     })
