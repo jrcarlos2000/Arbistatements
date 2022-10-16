@@ -42,6 +42,7 @@
         "typescript": "^4.8.4"
     },
     "dependencies": {
+        "@chainlink/contracts": "^0.5.1",
         "@semaphore-protocol/contracts": "2.5.0"
     },
     "config": {

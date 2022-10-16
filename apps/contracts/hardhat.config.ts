@@ -25,14 +25,9 @@ const hardhatConfig: HardhatUserConfig = {
         artifacts: config.paths.build.contracts
     },
     networks: {
-        polygonMumbai : {
-            url  : "https://polygontestapi.terminet.io/rpc",
-            chainId : 80001,
-            accounts
-        },
-        optimism : {
-            url : "https://goerli.optimism.io/",
-            chainId : 420,
+        arbitrum : {
+            url : "https://quaint-greatest-gadget.arbitrum-goerli.discover.quiknode.pro/b060186bff692501beab140a5da0116cbb9694af/",
+            chainId : 421613,
             accounts
         },
         hardhat: {
@@ -41,17 +36,7 @@ const hardhatConfig: HardhatUserConfig = {
         localhost : {
             url : "http://127.0.0.1:8545/",
             chainId : 1337
-        },
-        goerli : {
-            url : "https://eth-goerli.g.alchemy.com/v2/hWfQJAPySBhyWgNWQfuctPoP3nkqAL45",
-            chainId : 5,
-            accounts
-        },
-        boba : {
-            url : "https://replica.bobabase.boba.network",
-            chainId : 1297,
-            accounts
-        },
+        }
         
     },
     gasReporter: {
